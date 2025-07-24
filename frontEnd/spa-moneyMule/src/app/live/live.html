@@ -1,0 +1,50 @@
+<!-- Hero Section -->
+<section
+  class="hero-gradient text-white text-center d-flex justify-content-center align-items-center py-5"
+>
+  <div class="container">
+    <h2 class="fw-bold display-6">Real Time Detection</h2>
+    <p class="lead">Enter your transaction details to detect</p>
+  </div>
+</section>
+
+<form #txnForm="ngForm" class="container mt-4 p-4 bg-white rounded shadow-sm">
+  <!-- form rows -->
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Sender Account ID</label>
+      <input name="senderAccountId" [(ngModel)]="senderAccountId" required class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Receiver Account ID</label>
+      <input name="receiverAccountId" [(ngModel)]="receiverAccountId" required class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Amount</label>
+      <input type="number" name="amount" [(ngModel)]="amount" required class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Time</label>
+      <input type="datetime-local" name="time" [(ngModel)]="time" required class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Sender Bank</label>
+      <input name="senderBank" [(ngModel)]="senderBank" required class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Receiver Bank</label>
+      <input name="receiverBank" [(ngModel)]="receiverBank" required class="form-control" />
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <button type="button" class="btn btn-primary me-2" (click)="submitModel('xgboost',txnForm.value)" [disabled]="txnForm.invalid">AI/ML</button>
+    <button type="button" class="btn btn-secondary" (click)="submitModel('vae',txnForm.value)" [disabled]="txnForm.invalid">GenAI</button>
+  </div>
+</form>
+
+<div *ngIf="result !== null" class="mt-4">
+  <div class="p-3 rounded" [ngClass]="result === 0 ? 'bg-success text-white' : 'bg-danger text-white'">
+    <strong>{{ result === 0 ? 'Legitimate ✅' : 'Mule / Fraud 🔴' }}</strong>
+  </div>
+</div>

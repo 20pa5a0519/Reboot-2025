@@ -1,0 +1,40 @@
+.navbar {
+  border-radius: 8px 8px 0 0;
+}
+
+.btn-link {
+  text-decoration: none;
+  color: #344054;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.container {
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.4em 0.8em;
+}
+
+.table thead {
+  font-weight: bold;
+}
+
+.alert {
+  font-size: 0.95rem;
+}
+
+.progress {
+  border-radius: 4px;
+}
+
+.accDetails{
+  padding: 10px;
+}
+
+

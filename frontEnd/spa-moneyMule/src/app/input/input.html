@@ -1,0 +1,113 @@
+<!-- Hero Section -->
+<section
+  class="hero-gradient text-white text-center d-flex justify-content-center align-items-center py-5"
+>
+  <div class="container">
+    <h2 class="fw-bold display-6">Input Accounts for Risk Assessment</h2>
+    <p class="lead">Enter or select accounts to initiate risk analysis.</p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <h2 class="mb-4">Account Detection</h2>
+  <p class="mb-3">
+    Enter a bank account ID or phone number to detect potential mule accounts
+  </p>
+
+  <div class="card p-4 mb-4">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Bank Account ID</label>
+        <input
+          [(ngModel)]="accountId"
+          class="form-control"
+          placeholder="Enter account ID"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Phone Number</label>
+        <input
+          [(ngModel)]="phone"
+          class="form-control"
+          placeholder="Enter phone number"
+        />
+      </div>
+      <div class="col-12 text-center mt-3">
+        <button class="btn btn-primary px-4" (click)="detect()">
+          <i class="bi bi-search"></i> Detect Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="result === 0">
+    <div class="card p-4 border-success text-success mb-4">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-check-circle-fill fs-2 me-3"></i>
+        <div>
+          <h5 class="mb-1">Legitimate Account</h5>
+          <p class="mb-2">This account appears to be legitimate</p>
+        </div>
+        <span class="badge bg-success ms-auto py-2 px-3">Safe</span>
+      </div>
+      <div class="row text-center mt-4">
+        <div class="col">
+          <h4 class="fw-bold text-success">No Risk</h4>
+          <small>Risk Score</small>
+        </div>
+        <div class="col">
+          <h4 class="fw-bold">Valid</h4>
+          <small>KYC Fingerprinting</small>
+        </div>
+        <div class="col">
+          <h4 class="fw-bold">Normal</h4>
+          <small>Transaction Volume</small>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="result === 1">
+    <div class="card p-4 border-danger text-danger mb-4">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill fs-2 me-3"></i>
+        <div>
+          <h5 class="mb-1">Potential Mule Account</h5>
+          <p class="mb-2">High risk indicators detected</p>
+        </div>
+        <span class="badge bg-danger ms-auto py-2 px-3">High Risk</span>
+      </div>
+      <div class="row text-center mt-4">
+        <div class="col">
+          <h4 class="fw-bold text-danger">{{ riskScore }}</h4>
+          <small>Risk Score</small>
+        </div>
+        <div class="col">
+          <h4 class="fw-bold">{{ kyc_invalid_count }}</h4>
+          <small>KYC Invalid</small>
+        </div>
+        <div class="col">
+          <h4 class="fw-bold text-danger">{{ mule_count }}</h4>
+          <small>Suspicious Transactions</small>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <a [routerLink]="['/details', accountId]" class="btn btn-dark"
+          >View Details</a
+        >
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- not found case -->
+
+  <ng-container *ngIf="notFound === 1">
+    <div class="card p-4 border-warning text-warning mb-4">
+      <div class="d-flex align-items-center">
+        <p>Account Not Found</p>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<router-outlet></router-outlet>

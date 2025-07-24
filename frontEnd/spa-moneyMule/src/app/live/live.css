@@ -1,0 +1,13 @@
+/* live.component.css */
+.bg-success {
+  background-color: #198754 !important;
+}
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+/* Gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6);
+  height: 300px;
+}

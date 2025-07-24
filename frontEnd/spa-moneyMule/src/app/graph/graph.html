@@ -1,0 +1,131 @@
+<!-- <div class="graph-container">
+  <svg width="100%" height="600">
+    <defs>
+      <marker
+        id="arrow"
+        markerWidth="10"
+        markerHeight="10"
+        refX="8"
+        refY="3"
+        orient="auto"
+        markerUnits="strokeWidth"
+      >
+        <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+      </marker>
+    </defs> -->
+
+    <!-- Draw Links -->
+    <!-- <g *ngFor="let link of links">
+      <line
+        [attr.x1]="link.from_position?.x || 100"
+        [attr.y1]="link.from_position?.y || 100"
+        [attr.x2]="link.to_position?.x || 300"
+        [attr.y2]="link.to_position?.y || 300"
+        [attr.stroke]="link.color || '#999'"
+        [attr.stroke-width]="2"
+        marker-end="url(#arrow)"
+      ></line>
+    </g> -->
+
+    <!-- Draw Nodes -->
+    <!-- <g *ngFor="let node of nodes" class="node-group">
+      <circle
+        [attr.cx]="node.position?.x || 100"
+        [attr.cy]="node.position?.y || 100"
+        [attr.r]="15"
+        [attr.fill]="node.color || 'gray'"
+      ></circle>
+      <text
+        [attr.x]="node.position?.x || 100"
+        [attr.y]="(node.position?.y || 100) + 5"
+        text-anchor="middle"
+        fill="white"
+        font-size="10"
+      >
+        {{ node.label }}
+      </text>
+    </g>
+  </svg>
+</div> -->
+
+<!-- <ngx-graph
+  class="chart-container"
+  [view]="[800, 600]"
+  [nodes]="nodes"
+  [links]="links"
+  layout="dagre"
+  [panOnZoom]="true"
+  [draggingEnabled]="true"
+  [autoCenter]="true"
+  [autoZoom]="true">
+
+  <svg:defs>
+    <svg:marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <svg:path d="M0,0 L0,6 L9,3 z" fill="#333"></svg:path>
+    </svg:marker>
+  </svg:defs>
+
+  <ng-template #linkTemplate let-link>
+    <svg:g class="edge">
+      <svg:path
+        class="line"
+        [attr.stroke]="link.color"
+        [attr.stroke-width]="2"
+        marker-end="url(#arrow)"
+        [attr.d]="link.line?.path">
+      </svg:path>
+      <svg:text *ngIf="link.label && link.line?.path">
+        <svg:textPath [attr.href]="'#' + link.id" startOffset="50%">
+          {{ link.label }}
+        </svg:textPath>
+      </svg:text>
+    </svg:g>
+  </ng-template>
+
+  <ng-template #nodeTemplate let-node>
+    <svg:g class="node">
+      <svg:rect
+        [attr.width]="node.dimension.width"
+        [attr.height]="node.dimension.height"
+        rx="5"
+        [attr.fill]="node.data.color">
+      </svg:rect>
+      <svg:text
+        alignment-baseline="middle"
+        text-anchor="middle"
+        fill="#fff"
+        [attr.x]="node.dimension.width / 2"
+        [attr.y]="node.dimension.height / 2 + 4">
+        {{ node.label }}
+      </svg:text>
+    </svg:g>
+  </ng-template>
+
+</ngx-graph> -->
+
+<!-- <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl">
+  <h2 class="text-2xl font-bold mb-4 text-gray-800">Account Graph: {{ accountId }}</h2>
+  <div class="mb-4">
+    <label class="block font-semibold">Toggle Physics:</label>
+    <button class="btn" (click)="togglePhysics()">
+      {{ physicsEnabled ? 'Disable' : 'Enable' }} Physics
+    </button>
+  </div>
+  <div id="mynetwork"></div>
+  <p class="text-sm text-gray-600 mt-2">
+    Click a node to view its details.
+  </p>
+</div> -->
+
+<div class="container py-4">
+  <h2 class="text-center mb-4">Account Connectivity Graph</h2>
+
+  <div *ngIf="isLoading" class="text-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div #network class="graph-border" style="height: 600px;"></div>
+</div>
+

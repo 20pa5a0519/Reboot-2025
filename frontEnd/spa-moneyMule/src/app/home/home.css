@@ -1,0 +1,77 @@
+/* /* h2 {
+  font-weight: 700;
+}
+
+img {
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease-in-out;
+}
+
+img:hover {
+  transform: scale(1.1);
+}
+
+.fw-medium {
+  font-weight: 500;
+  color: #333;
+}
+
+.features {
+  background-color: bisque;
+  margin: 0px;
+} */
+
+/* .features-section h2 {
+  color: #0d6efd;
+} */
+
+.feature-box {
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+  background-color: #ffffff;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.feature-box img {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.feature-box img:hover {
+  transform: scale(1.1);
+}
+
+.fw-semibold {
+  color: #333;
+} 
+
+.features {
+  height: 550px;
+}
+
+.hero-section {
+  height: 450px;
+  background: linear-gradient(135deg, #88ace6, #d288db, #a995ea);
+  color: #fff;
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+.features-section {
+  background: linear-gradient(135deg, #fdfbff, #e7eafc);
+}
+
+.feature-box {
+  background: #fff;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}

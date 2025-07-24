@@ -1,0 +1,53 @@
+/* Gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6);
+  height: 350px;
+}
+
+/* .form-gradient {
+  background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+} */
+
+/* Make buttons look like in image */
+.btn-warning {
+  background-color: #facc15;
+  border: none;
+  color: #000;
+}
+
+.btn-warning:hover {
+  background-color: #eab308;
+  color: #000;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+}
+
+/* Smooth rounded form */
+.card input.form-control {
+  border-radius: 0.375rem;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.form-label {
+  color: #0f172a;
+}
+
+body {
+  background: #f8f9fa;
+}
+.card {
+  border-radius: 0.75rem;
+}
+.btn-primary {
+  min-width: 180px;
+}

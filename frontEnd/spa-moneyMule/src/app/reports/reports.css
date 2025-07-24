@@ -1,0 +1,34 @@
+.cards{
+  margin-top: 35px;
+}
+
+.tableView{
+  margin-top: 20px;
+}
+
+.card .btn-link:hover {
+  text-decoration: underline;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #a4b540, #54aeaa, #5cbef6);
+  height: 350px;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.card-title {
+  letter-spacing: 0.02em;
+}
+
+.display-4 {
+  font-size: 2.5rem;
+}
+
+.btn {
+  width: 140px;
+}
+
+
