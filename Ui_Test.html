@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vis.js Network - Account Graph</title>
+    <!-- Tailwind CSS CDN for basic styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vis.js Network CDN - Using jsdelivr.net for reliability -->
+    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <style>
+        /* Custom styles for the network container */
+        #mynetwork {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e2e8f0; /* Tailwind gray-200 */
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6366f1; /* Tailwind indigo-500 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom tooltip styles */
+        #customTooltip {
+            position: absolute;
+            background-color: #333; /* Dark background */
+            color: #fff; /* White text */
+            border: 1px solid #555;
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+            padding: 0.75rem; /* Tailwind p-3 */
+            font-size: 0.875rem; /* Tailwind text-sm */
+            z-index: 1000; /* Ensure it's on top */
+            pointer-events: none; /* Allows interaction with elements behind it */
+            opacity: 0; /* Start hidden, will be set to 1 by JS */
+            transition: opacity 0.2s ease-in-out; /* Smooth fade in/out */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Tailwind shadow-md */
+            max-width: 300px; /* Limit width */
+            word-wrap: break-word; /* Ensure long text wraps */
+            display: none; /* Controlled by JS */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 font-sans">
+    <div class="container mx-auto bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Account Graph Visualization & Analytics</h1>
+
+        <!-- Search Section -->
+        <div class="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Search Account Details</h2>
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <input type="text" id="searchInput" placeholder="Enter Account ID or Phone Number"
+                       class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <button id="searchGraphBtn" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center justify-center">
+                    <span id="buttonText">Search Graph</span>
+                    <span id="loadingSpinner" class="loading-spinner hidden"></span>
+                </button>
+            </div>
+            <div id="messageBox" class="mt-4 text-sm text-center"></div>
+        </div>
+
+        <!-- Static Suspicious Connectivity Label -->
+        <div class="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 flex justify-center">
+            <p class="text-xl font-semibold text-gray-700">Suspicious Connectivity</p>
+        </div>
+
+        <!-- Container for the network visualization -->
+        <div id="mynetwork" class="mb-6"></div>
+
+        <div class="text-center text-gray-600 text-sm">
+            <p>Enter an Account ID or Phone Number to visualize its related graph data from Neo4j via your Flask backend.</p>
+        </div>
+    </div>
+
+    <!-- Custom Tooltip Element -->
+    <div id="customTooltip"></div>
+
+    <script>
+        // Global variables for the network instance and data
+        window.network = null;
+        window.visNodes = new vis.DataSet([]);
+        window.visEdges = new vis.DataSet([]);
+        window.customTooltip = null; // Reference to the custom tooltip div
+        window.tooltipHideTimeout = null; // To manage the delay before hiding tooltip
+        window.currentHoveredElementId = null; // Tracks the ID of the currently hovered node/edge
+        window.currentHoveredElementType = null; // 'node' or 'edge'
+
+        // Flask backend URL base (the identifier will be appended)
+        const FLASK_API_BASE_URL = 'http://localhost:5000/api/account';
+
+        /**
+         * Displays a message in the message box.
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message (e.g., 'info', 'error', 'success').
+         * @param {string} boxId - The ID of the message box element (e.g., 'messageBox').
+         */
+        function showMessage(message, type = 'info', boxId = 'messageBox') {
+            const messageBox = document.getElementById(boxId);
+            messageBox.innerHTML = message;
+            messageBox.className = 'mt-4 text-sm text-center p-2 rounded';
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-400');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-400');
+            } else {
+                messageBox.classList.add('bg-blue-100', 'text-blue-700', 'border', 'border-blue-400');
+            }
+        }
+
+        /**
+         * Shows the custom tooltip with content at the specified coordinates.
+         * @param {string} content - The HTML content for the tooltip.
+         * @param {number} x - The x-coordinate (pageX) for positioning.
+         * @param {number} y - The y-coordinate (pageY) for positioning.
+         */
+        function showCustomTooltip(content, x, y) {
+            if (!window.customTooltip) {
+                console.error("Custom tooltip element not found.");
+                return;
+            }
+
+            // Clear any pending hide timeout
+            if (window.tooltipHideTimeout) {
+                clearTimeout(window.tooltipHideTimeout);
+                window.tooltipHideTimeout = null;
+            }
+
+            window.customTooltip.innerHTML = content;
+            window.customTooltip.style.display = 'block'; // Ensure it's displayed
+            window.customTooltip.style.opacity = '1'; // Ensure it's fully opaque
+            
+            // Position the tooltip relative to the mouse, with an offset
+            const offsetX = 15;
+            const offsetY = 15;
+
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Get tooltip dimensions
+            const tooltipWidth = window.customTooltip.offsetWidth;
+            const tooltipHeight = window.customTooltip.offsetHeight;
+
+            let finalX = x + offsetX;
+            let finalY = y + offsetY;
+
+            // Adjust if tooltip goes off right edge
+            if (finalX + tooltipWidth > viewportWidth) {
+                finalX = x - tooltipWidth - offsetX;
+            }
+            // Adjust if tooltip goes off bottom edge
+            if (finalY + tooltipHeight > viewportHeight) {
+                finalY = y - tooltipHeight - offsetY;
+            }
+            // Ensure it doesn't go off the left edge
+            if (finalX < 0) {
+                finalX = 0;
+            }
+            // Ensure it's not off the top edge
+            if (finalY < 0) {
+                finalY = 0;
+            }
+
+            window.customTooltip.style.left = `${finalX}px`;
+            window.customTooltip.style.top = `${finalY}px`;
+        }
+
+        /**
+         * Initiates a delayed hide for the custom tooltip.
+         */
+        function hideCustomTooltipDelayed() {
+            // Clear any existing hide timeout to prevent multiple calls
+            if (window.tooltipHideTimeout) {
+                clearTimeout(window.tooltipHideTimeout);
+            }
+            // Set a new timeout to hide the tooltip after a delay
+            window.tooltipHideTimeout = setTimeout(() => {
+                // Only hide if no element is currently hovered
+                if (window.currentHoveredElementId === null) {
+                    window.customTooltip.style.opacity = '0'; // Start fade out
+                    setTimeout(() => {
+                        window.customTooltip.style.display = 'none';
+                    }, 200); // Match CSS transition duration for opacity
+                }
+                window.tooltipHideTimeout = null; // Clear the timeout ID once executed
+            }, 1000); // Delay before starting fade out (1 second)
+        }
+
+        /**
+         * Immediately hides the custom tooltip (e.g., on click).
+         */
+        function hideCustomTooltipImmediate() {
+            if (window.customTooltip) {
+                // Clear any pending hide timeout
+                if (window.tooltipHideTimeout) {
+                    clearTimeout(window.tooltipHideTimeout);
+                    window.tooltipHideTimeout = null;
+                }
+                window.customTooltip.style.opacity = '0'; // Start fade out
+                // Immediately set display to none after a very short delay to allow transition
+                setTimeout(() => {
+                    window.customTooltip.style.display = 'none';
+                }, 50); // Small delay to allow opacity transition to start
+                window.currentHoveredElementId = null; // Reset hovered element
+                window.currentHoveredElementType = null;
+            }
+        }
+
+
+        /**
+         * Initializes or updates the Vis.js network.
+         */
+        function initializeNetwork() {
+            const container = document.getElementById('mynetwork');
+            window.customTooltip = document.getElementById('customTooltip'); // Get reference to tooltip div
+
+            const data = {
+                nodes: window.visNodes,
+                edges: window.visEdges
+            };
+
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    size: 20,
+                    font: {
+                        size: 16,
+                        color: '#333',
+                        strokeWidth: 2, // Add stroke to font for better readability on busy backgrounds
+                        strokeColor: '#fff' // White stroke for contrast
+                    },
+                    borderWidth: 2,
+                    shadow: true,
+                    fixed: false, // Ensure nodes are not fixed by default, allowing physics to arrange them
+                },
+                edges: {
+                    width: 3, // Increased width for better visibility
+                    shadow: true,
+                    color: {
+                        highlight: '#1e3a8a', // Tailwind blue-900
+                        hover: '#1d4ed8', // Tailwind blue-700
+                        opacity: 0.8
+                    },
+                    arrows: 'to',
+                    font: {
+                        size: 12,
+                        color: '#333',
+                        background: '#f8fafc', // Add background to edge labels for better visibility
+                        strokeWidth: 0 // No stroke for edge labels
+                    },
+                    smooth: { // Enable smooth curves for edges
+                        enabled: true,
+                        type: 'dynamic', // Dynamically adjust curves to avoid overlap
+                        roundness: 0.5 // Default roundness, can be adjusted if needed
+                    }
+                },
+                physics: {
+                    enabled: true, // Always start with physics enabled for initial layout
+                    barnesHut: {
+                        gravitationalConstant: -10000, // Much stronger repulsion
+                        centralGravity: 0.05, // Even less central pull
+                        springLength: 350, // Much longer ideal spring length
+                        springConstant: 0.08, // Slightly weaker springs
+                        damping: 0.999,
+                        avoidOverlap: 1.0 // Stronger overlap avoidance
+                    },
+                    solver: 'barnesHut',
+                    minVelocity: 0.1,
+                    stabilization: {
+                        enabled: true, // Enable stabilization for initial layout
+                        iterations: 4000, // Run for a fixed number of iterations
+                        updateInterval: 25,
+                        fit: true // Fit view to network after stabilization
+                    },
+                },
+                interaction: {
+                    hover: true,
+                    navigationButtons: true, // Enable navigation buttons for zoom/pan
+                    keyboard: true, // Enable keyboard navigation
+                    zoomView: true, // Allow zooming
+                    dragNodes: true, // Allow dragging nodes
+                    dragView: true, // Allow dragging the canvas
+                    tooltipDelay: 0 // Set to 0 as we're using custom tooltips, not native ones.
+                }
+            };
+
+            if (window.network) {
+                // If network already exists, just update its data
+                window.network.setData(data);
+                // Re-apply options to ensure physics settings are fresh, especially stabilization
+                window.network.setOptions(options);
+            } else {
+                // Otherwise, create a new network
+                window.network = new vis.Network(container, data, options);
+            }
+            console.log("Vis.js network initialized/updated successfully!");
+
+            // Listen for stabilization completion and then disable physics
+            window.network.once('stabilizationIterationsDone', function() {
+                if (window.network) {
+                    window.network.setOptions({ physics: false });
+                    showMessage('Graph has stabilized and physics is disabled.', 'success');
+                }
+            });
+            
+            // --- Custom Tooltip Event Listeners ---
+            window.network.on("hoverNode", function (params) {
+                window.currentHoveredElementId = params.node;
+                window.currentHoveredElementType = 'node';
+                const node = window.visNodes.get(params.node);
+                if (node && node.title) {
+                    // Use params.event.srcEvent for pageX/pageY if available, otherwise fallback to DOM coordinates
+                    const pageX = params.event.srcEvent ? params.event.srcEvent.pageX : window.network.canvasToDOM(params.pointer.canvas).x + window.scrollX;
+                    const pageY = params.event.srcEvent ? params.event.srcEvent.pageY : window.network.canvasToDOM(params.pointer.canvas).y + window.scrollY;
+                    showCustomTooltip(node.title, pageX, pageY);
+                }
+            });
+
+            window.network.on("blurNode", function (params) {
+                // Only set to null if this node was the one being hovered
+                if (window.currentHoveredElementId === params.node && window.currentHoveredElementType === 'node') {
+                    window.currentHoveredElementId = null;
+                    window.currentHoveredElementType = null;
+                    hideCustomTooltipDelayed();
+                }
+            });
+
+            window.network.on("hoverEdge", function (params) {
+                window.currentHoveredElementId = params.edge;
+                window.currentHoveredElementType = 'edge';
+                const edge = window.visEdges.get(params.edge);
+                if (edge && edge.title) {
+                    // Use params.event.srcEvent for pageX/pageY if available, otherwise fallback to DOM coordinates
+                    const pageX = params.event.srcEvent ? params.event.srcEvent.pageX : window.network.canvasToDOM(params.pointer.canvas).x + window.scrollX;
+                    const pageY = params.event.srcEvent ? params.event.srcEvent.pageY : window.network.canvasToDOM(params.pointer.canvas).y + window.scrollY;
+                    showCustomTooltip(edge.title, pageX, pageY);
+                }
+            });
+
+            window.network.on("blurEdge", function (params) {
+                // Only set to null if this edge was the one being hovered
+                if (window.currentHoveredElementId === params.edge && window.currentHoveredElementType === 'edge') {
+                    window.currentHoveredElementId = null;
+                    window.currentHoveredElementType = null;
+                    hideCustomTooltipDelayed();
+                }
+            });
+
+            // Hide tooltip during interactions to prevent flickering
+            window.network.on("beforeDrawing", function () {
+                hideCustomTooltipDelayed();
+            });
+            window.network.on("zoom", function () {
+                hideCustomTooltipDelayed();
+            });
+            window.network.on("dragEnd", function () {
+                hideCustomTooltipDelayed();
+            });
+
+            // Hide tooltip immediately on click
+            window.network.on("click", function (params) {
+                hideCustomTooltipImmediate();
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const clickedNode = window.visNodes.get(nodeId);
+                    if (clickedNode) {
+                        showMessage(`Clicked Node: ${clickedNode.label} (ID: ${clickedNode.id})`, 'info');
+                    }
+                } else if (params.edges.length > 0) {
+                    const edgeId = params.edges[0];
+                    const clickedEdge = window.visEdges.get(edgeId);
+                    if (clickedEdge) {
+                        showMessage(`Clicked Edge: ${clickedEdge.label} (From: ${clickedEdge.from}, To: ${clickedEdge.to})`, 'info');
+                    }
+                }
+            });
+
+            // Use network.on('mousemove') directly, as it provides pointer coordinates
+            window.network.on('mousemove', function(params) {
+                // Defensive check: ensure network and its methods are available
+                // getPointer is not needed here as params.pointer.canvas is directly available
+                if (!window.network || typeof window.network.getNodeAt !== 'function' || typeof window.network.getEdgeAt !== 'function') {
+                    return;
+                }
+                
+                const nodeId = window.network.getNodeAt(params.pointer.canvas);
+                const edgeId = window.network.getEdgeAt(params.pointer.canvas);
+
+                if (nodeId) {
+                    if (window.currentHoveredElementId !== nodeId || window.currentHoveredElementType !== 'node') {
+                        window.network.emit('hoverNode', { node: nodeId, event: params.event, x: params.pointer.canvas.x, y: params.pointer.canvas.y });
+                    }
+                } else if (edgeId) {
+                    if (window.currentHoveredElementId !== edgeId || window.currentHoveredElementType !== 'edge') {
+                        window.network.emit('hoverEdge', { edge: edgeId, event: params.event, x: params.pointer.canvas.x, y: params.pointer.canvas.y });
+                    }
+                } else {
+                    if (window.currentHoveredElementId !== null) {
+                        if (window.currentHoveredElementType === 'node') {
+                            window.network.emit('blurNode', { node: window.currentHoveredElementId });
+                        } else if (window.currentHoveredElementType === 'edge') {
+                            window.network.emit('blurEdge', { edge: window.currentHoveredElementId });
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Fetches graph data for a specific identifier from the Flask backend.
+         * @param {string} identifier - The account ID or phone number to search for.
+         */
+        async function fetchGraphData(identifier) {
+            const searchButton = document.getElementById('searchGraphBtn');
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            if (!identifier) {
+                showMessage('Please enter an Account ID or Phone Number to search.', 'error');
+                return;
+            }
+
+            searchButton.disabled = true;
+            buttonText.textContent = 'Searching...';
+            loadingSpinner.classList.remove('hidden');
+            showMessage(`Fetching graph data for "${identifier}" from backend...`, 'info');
+
+            try {
+                const url = `${FLASK_API_BASE_URL}/${encodeURIComponent(identifier)}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`Account or phone number "${identifier}" not found.`);
+                    }
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const graphData = await response.json();
+
+                const nodes = graphData.nodes || [];
+                const edges = graphData.edges || [];
+
+                if (nodes.length === 0 && edges.length === 0) {
+                    showMessage(`No graph data found for "${identifier}". Please check the ID/number.`, 'info');
+                    window.visNodes.clear(); // Clear existing graph
+                    window.visEdges.clear();
+                    initializeNetwork(); // Re-render empty network
+                    return;
+                }
+
+                window.visNodes.clear();
+                window.visNodes.add(nodes);
+                window.visEdges.clear();
+                window.visEdges.add(edges);
+
+                initializeNetwork(); // Re-initialize network with new data and physics enabled
+                showMessage(`Graph for "${identifier}" loaded successfully!`, 'success');
+
+            } catch (error) {
+                console.error("Error fetching graph data from Flask backend:", error);
+                showMessage(`Error loading graph: ${error.message}. Please ensure your Flask app is running, the API endpoint is correct, and the identifier exists in Neo4j.`, 'error');
+            } finally {
+                searchButton.disabled = false;
+                buttonText.textContent = 'Search Graph';
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Ensure the DOM is fully loaded before trying to access elements and add event listeners
+        window.onload = function() {
+            try {
+                // Initial check for Vis.js library
+                if (typeof vis === 'undefined' || !vis.Network) {
+                    console.error("Vis.js library not loaded correctly. 'vis' object or 'vis.Network' is undefined. This might be a network connection issue, an incorrect CDN link, or a browser caching problem.");
+                    document.getElementById('mynetwork').innerHTML = `
+                        <div class="flex items-center justify-center h-full text-red-600 font-semibold text-lg text-center p-4">
+                            Error: Vis.js library failed to load. Please check your internet connection, clear your browser cache, or try refreshing the page.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Attach event listener to the search button
+                document.getElementById('searchGraphBtn').addEventListener('click', () => {
+                    const identifier = document.getElementById('searchInput').value.trim();
+                    fetchGraphData(identifier);
+                });
+
+                // Initialize an empty network on page load
+                initializeNetwork(); // This will now start with physics enabled and auto-stabilize
+                showMessage('Enter an Account ID or Phone Number and click "Search Graph" to visualize.', 'info');
+
+            } catch (error) {
+                console.error("An error occurred during initial setup:", error);
+                document.getElementById('mynetwork').innerHTML = `
+                    <div class="flex items-center justify-center h-full text-red-600 font-semibold text-lg text-center p-4">
+                        An unexpected error occurred during setup: ${error.message}. Please try again.
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>
