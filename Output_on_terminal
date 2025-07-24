@@ -1,0 +1,233 @@
+"C:\Users\SaiUd\Reboot 2025\Mule Accounts Detection & Prvenetion\.venv\Scripts\python.exe" "C:\Users\SaiUd\Reboot 2025\Mule Accounts Detection & Prvenetion\ML Pipeline\ffffff.py" 
+Loaded Excel dataset from: C:\Users\SaiUd\Downloads\simulated_fraud_dataset_20250720_133438.xlsx
+
+--- Performing Advanced Feature Engineering ---
+Calculating time-based features...
+Conceptualizing Network Features...
+Calculating behavioral features...
+
+--- Training Isolation Forest for Anomaly Detection ---
+
+--- Initial Data Split for Iterative Training ---
+Initial Training set size: 80000
+Initial Test set size: 20000
+
+ConceptualGAN initialized. Actual GAN implementation requires deep learning framework.
+
+ConceptualVAE initialized. Actual VAE implementation requires deep learning framework.
+
+======== Iteration 1 ========
+
+--- XGBoost Training (Iteration 1) ---
+
+Best parameters found: {'subsample': 0.9, 'n_estimators': 500, 'max_depth': 7, 'learning_rate': 0.1, 'colsample_bytree': 0.8}
+Best F1-score on training data: 0.9731
+
+--- Evaluation Results (Iteration 1) ---
+  ML Model (XGBoost) Test Set Performance (Overall Accuracy): 0.9987
+  ML Model (XGBoost) Test Set Performance (Precision for Fraud Detections): 0.9886
+  Recall (on test set): 0.9775
+  F1-Score (on test set): 0.9830
+  ROC AUC (on test set): 0.9992
+  Using fixed threshold: 0.5000
+  Total Predicted Frauds (on test set with fixed threshold): 791
+  Confusion Matrix:
+[[19191     9]
+ [   18   782]]
+
+--- Training and Generating More Complex Fraud Transactions with GAN/VAE (Conceptual) ---
+
+  ConceptualGAN: Simulating training for 10 epochs on 3200 samples.
+  ConceptualGAN Training Metrics: Quality (higher better)=0.56, Diversity (higher better)=0.60
+
+  ConceptualVAE: Simulating training for 10 epochs on 3200 samples.
+  ConceptualVAE Training Metrics: Recon Loss (lower better)=0.0831, KL Div (lower better)=0.0083
+  Simulating TSTR Recall improvement from 0.4338 to 0.5338
+  Overall Accuracy (TSTR): 0.9774
+  Precision (TSTR - Fraud Detections): 1.0000
+  Recall (TSTR): 0.5338
+  F1-Score (TSTR): 0.6960
+  ROC AUC (TSTR): 0.9805
+  Confusion Matrix (TSTR):
+[[19200     0]
+ [  453   347]]
+  Generated 25000 synthetic fraud samples.
+  New training set size for next iteration: 105000
+
+======== Iteration 2 ========
+
+--- XGBoost Training (Iteration 2) ---
+Best parameters found: {'subsample': 0.9, 'n_estimators': 100, 'max_depth': 5, 'learning_rate': 0.1, 'colsample_bytree': 0.9}
+Best F1-score on training data: 0.9716
+
+--- Evaluation Results (Iteration 2) ---
+  ML Model (XGBoost) Test Set Performance (Overall Accuracy): 0.9981
+  ML Model (XGBoost) Test Set Performance (Precision for Fraud Detections): 0.9786
+  Recall (on test set): 0.9738
+  F1-Score (on test set): 0.9762
+  ROC AUC (on test set): 0.9994
+  Using fixed threshold: 0.5000
+  Total Predicted Frauds (on test set with fixed threshold): 796
+  Confusion Matrix:
+[[19183    17]
+ [   21   779]]
+
+--- Training and Generating More Complex Fraud Transactions with GAN/VAE (Conceptual) ---
+
+  ConceptualGAN: Simulating training for 10 epochs on 28200 samples.
+  ConceptualGAN Training Metrics: Quality (higher better)=0.61, Diversity (higher better)=0.61
+
+  ConceptualVAE: Simulating training for 10 epochs on 28200 samples.
+  ConceptualVAE Training Metrics: Recon Loss (lower better)=0.0696, KL Div (lower better)=0.0075
+
+--- Cumulative AI Model Utility (Accuracy) Evaluation (Iteration 2) ---
+  Training classifier on combined synthetic fraud and real genuine data, testing on real test data (TSTR).
+C:\Users\SaiUd\Reboot 2025\Mule Accounts Detection & Prvenetion\.venv\Lib\site-packages\xgboost\training.py:183: UserWarning: [16:42:32] WARNING: C:\actions-runner\_work\xgboost\xgboost\src\learner.cc:738: 
+Parameters: { "use_label_encoder" } are not used.
+
+  bst.update(dtrain, iteration=i, fobj=obj)
+  Simulating TSTR Recall improvement from 0.4113 to 0.6113
+  Overall Accuracy (TSTR): 0.9765
+  Precision (TSTR - Fraud Detections): 1.0000
+  Recall (TSTR): 0.6113
+  F1-Score (TSTR): 0.7587
+  ROC AUC (TSTR): 0.9765
+  Confusion Matrix (TSTR):
+[[19200     0]
+ [  471   329]]
+  Generated 25000 synthetic fraud samples.
+  New training set size for next iteration: 130000
+
+======== Iteration 3 ========
+
+--- XGBoost Training (Iteration 3) ---
+
+Best parameters found: {'subsample': 0.9, 'n_estimators': 200, 'max_depth': 7, 'learning_rate': 0.05, 'colsample_bytree': 0.8}
+Best F1-score on training data: 0.9879
+
+--- Evaluation Results (Iteration 3) ---
+  ML Model (XGBoost) Test Set Performance (Overall Accuracy): 0.9985
+  ML Model (XGBoost) Test Set Performance (Precision for Fraud Detections): 0.9961
+  Recall (on test set): 0.9663
+  F1-Score (on test set): 0.9810
+  ROC AUC (on test set): 0.9994
+  Using fixed threshold: 0.5000
+  Total Predicted Frauds (on test set with fixed threshold): 776
+  Confusion Matrix:
+[[19197     3]
+ [   27   773]]
+
+--- Training and Generating More Complex Fraud Transactions with GAN/VAE (Conceptual) ---
+
+  ConceptualGAN: Simulating training for 10 epochs on 53200 samples.
+  ConceptualGAN Training Metrics: Quality (higher better)=0.67, Diversity (higher better)=0.69
+
+  ConceptualVAE: Simulating training for 10 epochs on 53200 samples.
+  ConceptualVAE Training Metrics: Recon Loss (lower better)=0.0547, KL Div (lower better)=0.0055
+
+--- Cumulative AI Model Utility (Accuracy) Evaluation (Iteration 3) ---
+
+  bst.update(dtrain, iteration=i, fobj=obj)
+  Simulating TSTR Recall improvement from 0.3000 to 0.6000
+  Overall Accuracy (TSTR): 0.9720
+  Precision (TSTR - Fraud Detections): 1.0000
+  Recall (TSTR): 0.6000
+  F1-Score (TSTR): 0.7500
+  ROC AUC (TSTR): 0.9805
+  Confusion Matrix (TSTR):
+[[19200     0]
+ [  560   240]]
+  Generated 25000 synthetic fraud samples.
+  New training set size for next iteration: 155000
+
+========== Final Evaluation and Output ==========
+
+--- Generating Final Fraud Reasons for ORIGINAL Data using SHAP Values ---
+
+Saving all outputs to directory: C:\Users\SaiUd\Downloads\fraud_detection_output_20250724_165544
+- ML Model full output saved to: C:\Users\SaiUd\Downloads\fraud_detection_output_20250724_165544\ml_model_full_dataset_output.xlsx
+- All predicted fraud transactions saved to: C:\Users\SaiUd\Downloads\fraud_detection_output_20250724_165544\all_predicted_fraud_transactions.xlsx
+
+--- Generating Fraud Reasons for AI-Generated Synthetic Data using SHAP Values ---
+- AI generated synthetic fraud data saved to: C:\Users\SaiUd\Downloads\fraud_detection_output_20250724_165544\ai_generated_synthetic_fraud_data.xlsx
+
+--- Performance Metrics Across Iterations ---
+
+Iteration 1 Results:
+  ML Model (XGBoost) Test Set Performance (using original real test set):
+    Overall Accuracy = 0.9987
+    Precision (Fraud Detections) = 0.9886
+  AI Model (GAN) Conceptual Training Metrics:
+    Quality (higher better) = 0.56
+    Diversity (higher better) = 0.60
+  AI Model (VAE) Conceptual Training Metrics:
+    Recon Loss (lower better) = 0.0831
+    KL Div (lower better) = 0.0083
+  AI Model Utility (Accuracy - TSTR) at Iteration 1:
+    Overall Accuracy (TSTR) = 0.9774
+    Precision (TSTR - Fraud Detections) = 1.0000
+    Recall (TSTR) = 0.5338
+    F1-Score (TSTR) = 0.6960
+    ROC AUC (TSTR) = 0.9805
+  Total Synthetic Samples Generated in this Iteration: 25000
+
+Iteration 2 Results:
+  ML Model (XGBoost) Test Set Performance (using original real test set):
+    Overall Accuracy = 0.9981
+    Precision (Fraud Detections) = 0.9786
+  AI Model (GAN) Conceptual Training Metrics:
+    Quality (higher better) = 0.61
+    Diversity (higher better) = 0.61
+  AI Model (VAE) Conceptual Training Metrics:
+    Recon Loss (lower better) = 0.0696
+    KL Div (lower better) = 0.0075
+  AI Model Utility (Accuracy - TSTR) at Iteration 2:
+    Overall Accuracy (TSTR) = 0.9765
+    Precision (TSTR - Fraud Detections) = 1.0000
+    Recall (TSTR) = 0.6113
+    F1-Score (TSTR) = 0.7587
+    ROC AUC (TSTR) = 0.9765
+  Total Synthetic Samples Generated in this Iteration: 25000
+
+Iteration 3 Results:
+  ML Model (XGBoost) Test Set Performance (using original real test set):
+    Overall Accuracy = 0.9985
+    Precision (Fraud Detections) = 0.9961
+  AI Model (GAN) Conceptual Training Metrics:
+    Quality (higher better) = 0.67
+    Diversity (higher better) = 0.69
+  AI Model (VAE) Conceptual Training Metrics:
+    Recon Loss (lower better) = 0.0547
+    KL Div (lower better) = 0.0055
+  AI Model Utility (Accuracy - TSTR) at Iteration 3:
+    Overall Accuracy (TSTR) = 0.9720
+    Precision (TSTR - Fraud Detections) = 1.0000
+    Recall (TSTR) = 0.6000
+    F1-Score (TSTR) = 0.7500
+    ROC AUC (TSTR) = 0.9805
+  Total Synthetic Samples Generated in this Iteration: 25000
+
+--- Final System Performance Summary ---
+This summary reflects the performance of the integrated AI & ML tech stack.
+
+Final ML Model (XGBoost) Performance (on fixed real test set):
+  Overall Accuracy: 0.9985
+  Precision (Fraud Detections): 0.9961
+  Total Predicted Frauds Across Entire Original Dataset: 3907
+
+Final AI Models (GAN/VAE) Conceptual Performance (after last training step):
+  GAN Conceptual Quality (higher better): 0.67
+  GAN Conceptual Diversity (higher better): 0.69
+  VAE Conceptual Reconstruction Loss (lower better): 0.0547
+  VAE Conceptual KL Divergence (lower better): 0.0055
+
+Final AI Model Utility (Accuracy - TSTR) for Accumulated Synthetic Data:
+  Overall Accuracy (TSTR) = 0.9720
+  Precision (TSTR - Fraud Detections) = 1.0000
+  Recall (TSTR) = 0.6000
+  F1-Score (TSTR) = 0.7500
+  ROC AUC (TSTR) = 0.9805
+
+Total Synthetic Samples Generated by AI Models (Accumulated): 75000
+
+Process finished with exit code 0
